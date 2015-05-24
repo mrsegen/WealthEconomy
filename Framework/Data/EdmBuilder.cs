@@ -138,10 +138,29 @@ namespace Microsoft.OData.Edm
                 using (var writer = XmlWriter.Create(stream))
                 {
                     System.Data.Entity.Infrastructure.EdmxWriter.WriteEdmx(dbContext, writer);
+                    //Microsoft.OData.Edm.Csdl.EdmxWriter.TryWriteEdmx(edm, writer, Microsoft.OData.Edm.Csdl.EdmxTarget.EntityFramework, out errors2);
+                    //Microsoft.OData.Edm.Csdl.EdmxWriter.TryWriteEdmx(dbContext, writer, Microsoft.OData.Edm.Csdl.EdmxTarget.EntityFramework, out errors2);
                 }
 
+                /* UNCOMMENT THIS IN CASE YOU WANT TO SAVE AND INSPECT THE EDMX FILE */
                 stream.Position = 0;
+                
+                var edmxDocument = new System.Xml.XmlDocument();
+                //edmxDocument.Load(stream);
+                // edmxDocument.Save(@"D:\v4.xml");
 
+                edmxDocument.Load(@"D:\v4_EF.xml");
+                // edmxDocument.Save(stream);
+                
+                // edmxDocument.
+
+                //XmlReader xmlReader = new XmlNodeReader(edmxDocument);
+                
+                //var xmlReader = new System.Xml.XmlReader();
+                //xmlReader.
+
+                //stream.Position = 0;
+                
                 // Add readonly properties
                 var edmx = System.Xml.Linq.XDocument.Load(stream);
                 AddReadonlyProperty(edmx, "ResourcePool", "OtherUsersResourcePoolRateTotal", "Decimal", true);
@@ -154,10 +173,28 @@ namespace Microsoft.OData.Edm
                 //AddReadonlyProperty(edmx, "ElementCell", "OtherUsersRatingAverage", "Decimal", true);
                 AddReadonlyProperty(edmx, "ElementCell", "OtherUsersRatingCount", "Int32", false);
 
-                using (var reader = edmx.CreateReader())
+                ///* UNCOMMENT THIS IN CASE YOU WANT TO SAVE AND INSPECT THE EDMX FILE */
+                //stream.Position = 0;
+                //var edmxDocument = new System.Xml.XmlDocument();
+                ////edmxDocument.Load(stream);
+                //// edmxDocument.Save(@"D:\v4.xml");
+
+                //edmxDocument.Load(@"D:\v4_EF.xml");
+                //edmxDocument.Save(stream);
+
+                Microsoft.OData.Edm.IEdmModel edm;
+
+                var errors = new System.Collections.Generic.List<Microsoft.OData.Edm.Validation.EdmError>().AsEnumerable();
+                //var errors2 = errors.AsEnumerable();
+
+                // using (var reader = edmx.CreateReader())
+                using (var reader = new XmlNodeReader(edmxDocument))
                 {
-                    return EdmxReader.Parse(reader);
+                    //return EdmxReader.Parse(reader);
+                    EdmxReader.TryParse(reader, true, out edm, out errors);
                 }
+
+                return edm;
 
                 // Old part
                 //using (var reader = XmlReader.Create(stream))

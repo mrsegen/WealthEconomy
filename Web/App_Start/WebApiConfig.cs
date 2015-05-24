@@ -10,6 +10,12 @@ using Web.ExceptionHandling;
 
 namespace Web
 {
+    public class Test
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
@@ -43,21 +49,63 @@ namespace Web
             //    batchHandler: new BatchHandler(GlobalConfiguration.DefaultServer));
 
             // Routes
-            // var edm = Facade.DbUtility.GetWealthEconomyContextEdm();
+            var edmOld = Facade.DbUtility.GetWealthEconomyContextEdm();
 
             var builder = new System.Web.OData.Builder.ODataConventionModelBuilder();
-            builder.EntitySet<BusinessObjects.ResourcePool>("ResourcePool");
-            builder.EntitySet<BusinessObjects.UserResourcePool>("UserResourcePool");
-            builder.EntitySet<BusinessObjects.User>("User");
-            builder.EntitySet<BusinessObjects.UserRole>("UserRole");
-            builder.EntitySet<BusinessObjects.UserLogin>("UserLogin");
-            builder.Namespace = "BusinessObjects";
-            var edm = builder.GetEdmModel();
+            //builder.EntitySet<BusinessObjects.ResourcePool>("ResourcePool");
+            //builder.EntitySet<BusinessObjects.UserResourcePool>("UserResourcePool");
+            builder.EntitySet<Test>("Test");
+            builder.Namespace = "Web";
+            //var edm = builder.GetEdmModel();
+            Microsoft.OData.Edm.IEdmModel edm2;
+
+            using (var stream = new System.IO.MemoryStream())
+            {
+                var errors = new System.Collections.Generic.List<Microsoft.OData.Edm.Validation.EdmError>();
+                var errors2 = errors.AsEnumerable();
+                using (var writer = System.Xml.XmlWriter.Create(stream))
+                {
+                    Microsoft.OData.Edm.Csdl.EdmxWriter.TryWriteEdmx(edmOld, writer, Microsoft.OData.Edm.Csdl.EdmxTarget.EntityFramework, out errors2);
+                    // System.Data.Entity.Infrastructure.EdmxWriter.WriteEdmx(edm, writer);
+                }
+
+                stream.Position = 0;
+
+                //// Add readonly properties
+                var edmx = System.Xml.Linq.XDocument.Load(stream);
+                //AddReadonlyProperty(edmx, "ResourcePool", "OtherUsersResourcePoolRateTotal", "Decimal", true);
+                ////AddReadonlyProperty(edmx, "ResourcePool", "OtherUsersResourcePoolRateAverage", "Decimal", true);
+                //AddReadonlyProperty(edmx, "ResourcePool", "OtherUsersResourcePoolRateCount", "Int32", false);
+                //AddReadonlyProperty(edmx, "ElementFieldIndex", "OtherUsersIndexRatingTotal", "Decimal", true);
+                ////AddReadonlyProperty(edmx, "ElementFieldIndex", "OtherUsersIndexRatingAverage", "Decimal", true);
+                //AddReadonlyProperty(edmx, "ElementFieldIndex", "OtherUsersIndexRatingCount", "Int32", false);
+                //AddReadonlyProperty(edmx, "ElementCell", "OtherUsersRatingTotal", "Decimal", true);
+                ////AddReadonlyProperty(edmx, "ElementCell", "OtherUsersRatingAverage", "Decimal", true);
+                //AddReadonlyProperty(edmx, "ElementCell", "OtherUsersRatingCount", "Int32", false);
+
+                /* UNCOMMENT THIS IN CASE YOU WANT TO SAVE AND INSPECT THE EDMX FILE */
+                stream.Position = 0;
+                var edmxDocument = new System.Xml.XmlDocument();
+                edmxDocument.Load(stream);
+                //edmxDocument.Save(@"D:\v4.xml");
+
+                using (var reader = edmx.CreateReader())
+                {
+                    // edm2 = Microsoft.OData.Edm.Csdl.EdmxReader.Parse(reader);
+                    edm2 = Microsoft.OData.Edm.Csdl.EdmxReader.Parse(reader);
+                }
+
+                // Old part
+                //using (var reader = XmlReader.Create(stream))
+                //{
+                //    return EdmxReader.Parse(reader);
+                //}
+            }
 
             config.MapODataServiceRoute(
                 routeName: "ODataRoute",
                 routePrefix: "odata",
-                model: edm,
+                model: edmOld,
                 batchHandler: new BatchHandler(GlobalConfiguration.DefaultServer));
 
             // Exception logger
