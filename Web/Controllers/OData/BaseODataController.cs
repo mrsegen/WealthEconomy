@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.OData;
+using System.Web.OData;
 using Web.Controllers.Extensions;
 
 namespace Web.Controllers.OData

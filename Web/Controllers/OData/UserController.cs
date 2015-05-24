@@ -5,7 +5,7 @@ namespace Web.Controllers.OData
     using System.Net;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.OData;
+    using System.Web.OData;
     using Web.Controllers.Extensions;
 
     public partial class UsersController

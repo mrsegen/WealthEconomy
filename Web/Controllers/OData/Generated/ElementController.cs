@@ -19,7 +19,7 @@ namespace Web.Controllers.OData
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.ModelBinding;
-    using System.Web.Http.OData;
+    using System.Web.OData;
 
     public abstract class BaseElementController : BaseODataController
     {

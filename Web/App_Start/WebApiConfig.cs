@@ -3,9 +3,9 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Filters;
-using System.Web.Http.OData;
-using System.Web.Http.OData.Batch;
-using System.Web.Http.OData.Extensions;
+using System.Web.OData;
+using System.Web.OData.Batch;
+using System.Web.OData.Extensions;
 using Web.ExceptionHandling;
 
 namespace Web
@@ -43,8 +43,18 @@ namespace Web
             //    batchHandler: new BatchHandler(GlobalConfiguration.DefaultServer));
 
             // Routes
-            var edm = Facade.DbUtility.GetWealthEconomyContextEdm();
-            config.Routes.MapODataServiceRoute(
+            // var edm = Facade.DbUtility.GetWealthEconomyContextEdm();
+
+            var builder = new System.Web.OData.Builder.ODataConventionModelBuilder();
+            builder.EntitySet<BusinessObjects.ResourcePool>("ResourcePool");
+            builder.EntitySet<BusinessObjects.UserResourcePool>("UserResourcePool");
+            builder.EntitySet<BusinessObjects.User>("User");
+            builder.EntitySet<BusinessObjects.UserRole>("UserRole");
+            builder.EntitySet<BusinessObjects.UserLogin>("UserLogin");
+            builder.Namespace = "BusinessObjects";
+            var edm = builder.GetEdmModel();
+
+            config.MapODataServiceRoute(
                 routeName: "ODataRoute",
                 routePrefix: "odata",
                 model: edm,

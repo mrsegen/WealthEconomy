@@ -1,6 +1,6 @@
 ﻿using BusinessObjects;
 using DataObjects;
-using Microsoft.Data.Edm;
+using Microsoft.OData.Edm;
 
 namespace Facade
 {
